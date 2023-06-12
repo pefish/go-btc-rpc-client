@@ -145,3 +145,32 @@ func (brc *BtcRpcClient) EstimateSmartFee() (string, error) {
 	}
 	return go_decimal.Decimal.Start(result.Result.Feerate).MustShiftedBy(5).EndForString(), nil
 }
+
+func (brc *BtcRpcClient) SendRawTransaction(txHex string) (string, error) {
+	var result struct {
+		Result string  `json:"result"`
+		Error  *string `json:"error"`
+	}
+	_, err := go_http.NewHttpRequester(go_http.WithTimeout(brc.timeout), go_http.WithLogger(brc.logger)).PostForStruct(go_http.RequestParam{
+		Url: brc.baseUrl,
+		Params: map[string]interface{}{
+			"jsonrpc": "2.0",
+			"method":  "sendrawtransaction",
+			"params": []interface{}{
+				txHex,
+			},
+			"id": 1,
+		},
+		BasicAuth: &go_http.BasicAuth{
+			Username: brc.username,
+			Password: brc.password,
+		},
+	}, &result)
+	if err != nil {
+		return "", err
+	}
+	if result.Error != nil {
+		return "", fmt.Errorf(*result.Error)
+	}
+	return result.Result, nil
+}
