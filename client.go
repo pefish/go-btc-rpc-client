@@ -43,6 +43,7 @@ type GetRawTransactionResult struct {
 		ScriptPubKey struct {
 			Address string `json:"address"`
 			Type    string `json:"type"`
+			Hex     string `json:"hex"`
 		} `json:"scriptPubKey"`
 	} `json:"vout"`
 	Confirmations uint64 `json:"confirmations,omitempty"`
